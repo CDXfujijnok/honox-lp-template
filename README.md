@@ -135,18 +135,47 @@ docker compose up -d
 ## ブランチ運用（チーム開発）
 
 ```
-main ─────────────────────────── 本番リリース用（直接コミット禁止）
-  └── develop ───────────────── 開発統合ブランチ
-        ├── feature/hero        各自の作業ブランチ
-        ├── feature/footer
-        └── feature/contact-form
+main      ─── 本番リリース用（直接コミット禁止）
+  └── develop ─── 開発統合ブランチ（常にここから作業ブランチを切る）
+        ├── feature/kfujino-hero     担当者名-機能名
+        ├── feature/tanaka-footer
+        └── feature/suzuki-contact-form
 ```
 
-| ブランチ | 用途 | 操作 |
+| ブランチ | 用途 | ルール |
 |---|---|---|
-| `main` | 本番（触らない） | `develop` からのマージのみ |
-| `develop` | 開発の統合先 | PR経由でマージ |
-| `feature/xxx` | 各機能・セクションの作業用 | 自由に作業 |
+| `main` | 本番（触らない） | `develop` からのPRマージのみ |
+| `develop` | 開発の統合先 | 作業完了後にPRでマージ |
+| `feature/名前-機能` | 各自の作業ブランチ | 都度作成・都度削除 |
+
+### 作業ブランチの作り方（毎回の手順）
+
+```bash
+# 1. まず develop を最新にする
+git checkout develop
+git pull
+
+# 2. 作業ブランチを作成（develop から切る）
+git checkout -b feature/kfujino-hero
+
+# 3. 作業・コミット
+git add .
+git commit -m "feat: add Hero section"
+
+# 4. GitHubにpush
+git push -u origin feature/kfujino-hero
+
+# 5. GitHubでPRを作成 → develop にマージ → ブランチ削除
+```
+
+### SourceTreeでの操作
+
+| 操作 | SourceTree |
+|---|---|
+| ブランチ作成 | 上部「ブランチ」ボタン → ブランチ名入力 → 「ブランチを作成」|
+| ブランチ切替 | 左メニューのブランチ名をダブルクリック |
+| push | 上部「プッシュ」ボタン |
+| PR作成 | GitHubをブラウザで開いて「Compare & pull request」|
 
 ---
 
