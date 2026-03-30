@@ -1,0 +1,14 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev          # 開発時は dev ステージを使用
+    container_name: honox_lp_dev
+    ports:
+      - "5173:5173"        # ブラウザ: http://localhost:5173
+    volumes:
+      - .:/app             # ホストのファイルをコンテナにマウント（ホットリロード）
+      - /app/node_modules  # node_modules はコンテナ内のものを優先
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped

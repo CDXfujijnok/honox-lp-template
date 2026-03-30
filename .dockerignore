@@ -1,0 +1,9 @@
+node_modules
+dist
+.hono
+.wrangler
+.env
+.env.production
+.dev.vars
+*.log
+.git
