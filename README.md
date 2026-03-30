@@ -102,7 +102,11 @@ npm run dev
 ### 方法B: Docker（チーム開発推奨）
 
 ```bash
-docker compose up
+# 初回 or Dockerfile変更後（ビルド＋起動）
+docker compose up --build
+
+# 2回目以降（バックグラウンド起動）
+docker compose up -d
 # → http://localhost:5173/
 ```
 
@@ -227,6 +231,8 @@ export default jsxRenderer(({ children, title, description }) => {
 
 ## 開発コマンド
 
+### ローカル（npm）
+
 ```bash
 # 開発サーバー起動
 npm run dev
@@ -239,6 +245,34 @@ npm run preview
 
 # Cloudflare Pages へデプロイ
 npm run deploy
+```
+
+### Docker
+
+```bash
+# 初回 or Dockerfile変更後（ビルド＋起動）
+docker compose up --build
+
+# バックグラウンドで起動
+docker compose up -d
+
+# フォアグラウンドで起動（ログをリアルタイム表示）
+docker compose up
+
+# 停止
+docker compose down
+
+# ログをリアルタイムで確認
+docker compose logs -f
+
+# コンテナの状態確認
+docker compose ps
+
+# コンテナ内でコマンド実行（例: npm install後など）
+docker compose exec app sh
+
+# イメージ・コンテナをすべて削除してクリーンな状態に戻す
+docker compose down --rmi all --volumes
 ```
 
 ---
