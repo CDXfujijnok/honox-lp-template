@@ -1,13 +1,26 @@
 import { createRoute } from 'honox/factory'
-import Counter from '../islands/counter'
+import Header from '../components/Header'
+import Hero from '../components/Hero'
+import Features from '../components/Features'
+import HowItWorks from '../components/HowItWorks'
+import Pricing from '../components/Pricing'
+import CTA from '../components/CTA'
+import Footer from '../components/Footer'
+import Accordion from '../islands/Accordion'
 
 export default createRoute((c) => {
-  const name = c.req.query('name') ?? 'Hono'
   return c.render(
-    <div class="py-8 text-center">
-      <title>{name}</title>
-      <h1 class="text-3xl font-bold">Hello, {name}!</h1>
-      <Counter />
+    <div class="min-h-screen">
+      <Header />
+      <main>
+        <Hero />
+        <Features />
+        <HowItWorks />
+        <Pricing />
+        <Accordion />
+        <CTA />
+      </main>
+      <Footer />
     </div>
   )
 })
