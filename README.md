@@ -1,4 +1,8 @@
-# HonoX LP 制作プロジェクト
+# HonoX LP テンプレート
+
+> 新しいLPを作る際は [GitHub テンプレート](https://github.com/CDXfujijnok/honox-lp-template) の **「Use this template」** から複製してください。
+
+---
 
 ## HonoX とは？
 
@@ -13,6 +17,7 @@
 | **ファイルベースルーティング** | `app/routes/` 配下のファイル名がそのままURLになる |
 | **JSX対応** | ReactライクなJSXでUIを記述できる |
 | **Vite統合** | Viteによる高速なHMR（ホットリロード）開発環境 |
+| **Tailwind CSS v4** | `@tailwindcss/vite` によりゼロ設定で利用可能 |
 | **マルチデプロイ** | Cloudflare Pages / AWS Lambda / Node.js 等に対応 |
 
 ### Islands Architecture とは？
@@ -37,22 +42,25 @@ LPのような主に静的なページに最適なアーキテクチャです。
 ## ファイル構造
 
 ```
-HonoX_test/
+honox-lp-template/
 ├── app/                        # アプリケーション本体
 │   ├── routes/                 # ページ（ファイル名 = URL）
 │   │   ├── index.tsx           # → / (トップページ)
 │   │   ├── _renderer.tsx       # HTMLの共通レイアウト（全ページ共通）
 │   │   ├── _404.tsx            # 404エラーページ
 │   │   └── _error.tsx          # エラーページ
-│   ├── islands/                # クライアントサイドコンポーネント
+│   ├── islands/                # クライアントサイドコンポーネント（JS同梱）
 │   │   └── counter.tsx         # インタラクティブなUIパーツの例
 │   ├── components/             # (作成予定) サーバーサイド静的コンポーネント
 │   ├── client.ts               # クライアントサイドのエントリポイント
 │   ├── server.ts               # サーバーサイドのエントリポイント
 │   ├── global.d.ts             # 型定義ファイル
-│   └── style.css               # グローバルスタイル
+│   └── style.css               # グローバルスタイル（Tailwind CSS）
 ├── public/                     # 静的ファイル（画像・フォント等）
-├── node_modules/               # npmパッケージ
+├── Dockerfile                  # Docker イメージ定義（dev / builder / prod）
+├── docker-compose.yml          # Docker Compose 開発環境設定
+├── .dockerignore               # Dockerビルド除外設定
+├── .gitattributes              # 改行コード統一設定
 ├── package.json                # プロジェクト設定・依存関係
 ├── tsconfig.json               # TypeScript設定
 ├── vite.config.ts              # Viteビルド設定
@@ -80,66 +88,90 @@ HonoX_test/
 
 ---
 
-## LP 制作手順
+## 開発環境のセットアップ（初回のみ）
 
-### Step 1: 環境構築（完了）
+### 方法A: ローカル（Node.js）
 
 ```bash
-# Node.js インストール後
-npm create hono@latest . -- --template x-basic
+node -v   # v24以上を確認
+npm install
 npm run dev
-# → http://localhost:5173/ で確認
+# → http://localhost:5173/
 ```
 
-### Step 2: Tailwind CSS の導入
+### 方法B: Docker（チーム開発推奨）
 
 ```bash
-npm install -D tailwindcss @tailwindcss/vite
+docker compose up
+# → http://localhost:5173/
 ```
 
-`vite.config.ts` に追記：
+> Docker Desktop がインストールされている必要があります。
 
-```ts
-import tailwindcss from '@tailwindcss/vite'
+---
 
-export default defineConfig({
-  plugins: [honox(), tailwindcss()],
-})
-```
-
-`app/style.css` に追記：
-
-```css
-@import "tailwindcss";
-```
-
-### Step 3: LP セクション設計
-
-LPの典型的なセクション構成：
+## 新しいLPの作り方（テンプレートから複製）
 
 ```
-/  (index.tsx)
-├── Hero        ← キャッチコピー・CTA
+1. GitHub: https://github.com/CDXfujijnok/honox-lp-template
+           「Use this template」→「Create a new repository」
+                ↓
+2. 新リポジトリ名を入力（例: lp-service-a）して作成
+                ↓
+3. SourceTree でクローン
+   クローン先: C:\Users\kfuji\Desktop\lp-service-a
+                ↓
+4. docker compose up  または  npm run dev
+                ↓
+5. 開発開始！
+```
+
+---
+
+## ブランチ運用（チーム開発）
+
+```
+main ─────────────────────────── 本番リリース用（直接コミット禁止）
+  └── develop ───────────────── 開発統合ブランチ
+        ├── feature/hero        各自の作業ブランチ
+        ├── feature/footer
+        └── feature/contact-form
+```
+
+| ブランチ | 用途 | 操作 |
+|---|---|---|
+| `main` | 本番（触らない） | `develop` からのマージのみ |
+| `develop` | 開発の統合先 | PR経由でマージ |
+| `feature/xxx` | 各機能・セクションの作業用 | 自由に作業 |
+
+---
+
+## LP セクション構成（実装ガイド）
+
+```
+/  (app/routes/index.tsx)
+├── Header      ← ナビゲーション
+├── Hero        ← キャッチコピー・メインCTA
 ├── Features    ← 特徴・強み（3〜4項目）
 ├── HowItWorks  ← 使い方・フロー
 ├── Testimonials← お客様の声
 ├── Pricing     ← 料金プラン（必要に応じて）
-├── FAQ         ← よくある質問
+├── FAQ         ← よくある質問（Islandコンポーネント）
 ├── CTA         ← 最終コールトゥアクション
 └── Footer      ← リンク・著作権
 ```
 
-### Step 4: コンポーネント実装
+### コンポーネント配置
 
 ```
 app/
-├── components/          # 静的セクションコンポーネント
+├── components/          # 静的セクション（サーバーサイド）
 │   ├── Hero.tsx
 │   ├── Features.tsx
 │   ├── HowItWorks.tsx
 │   ├── Footer.tsx
 │   └── ...
-├── islands/             # 動的コンポーネント
+├── islands/             # 動的コンポーネント（クライアントサイド）
 │   ├── ContactForm.tsx  # お問い合わせフォーム
 │   ├── Accordion.tsx    # FAQ アコーディオン
 │   └── ...
@@ -165,7 +197,9 @@ export default function Home() {
 }
 ```
 
-### Step 5: SEO 対応
+---
+
+## SEO 対応
 
 `app/routes/_renderer.tsx` でメタタグを設定：
 
@@ -189,16 +223,6 @@ export default jsxRenderer(({ children, title, description }) => {
 })
 ```
 
-### Step 6: ビルド・デプロイ
-
-```bash
-# ビルド
-npm run build
-
-# Cloudflare Pages へデプロイ（wrangler使用）
-npx wrangler pages deploy dist
-```
-
 ---
 
 ## 開発コマンド
@@ -212,7 +236,24 @@ npm run build
 
 # ビルド結果のプレビュー
 npm run preview
+
+# Cloudflare Pages へデプロイ
+npm run deploy
 ```
+
+---
+
+## 技術スタック
+
+| 技術 | バージョン | 役割 |
+|---|---|---|
+| HonoX | ^0.1.55 | メタフレームワーク |
+| Hono | ^4.12.9 | Webフレームワーク |
+| Vite | ^6.x | ビルドツール・開発サーバー |
+| Tailwind CSS | ^4.x | スタイリング |
+| TypeScript | - | 型安全 |
+| Node.js | v24 LTS | ランタイム |
+| Docker | - | 開発環境コンテナ |
 
 ---
 
@@ -221,3 +262,5 @@ npm run preview
 - [HonoX GitHub](https://github.com/honojs/honox)
 - [Hono 公式ドキュメント](https://hono.dev/)
 - [Vite 公式ドキュメント](https://vitejs.dev/)
+- [Tailwind CSS v4](https://tailwindcss.com/)
+- [テンプレートリポジトリ](https://github.com/CDXfujijnok/honox-lp-template)
